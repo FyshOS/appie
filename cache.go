@@ -1,13 +1,11 @@
-package icon
-
-import "fyshos.com/fynedesk"
+package appie
 
 type appCache struct {
-	source  fynedesk.ApplicationProvider
-	appList []fynedesk.AppData
+	source  ApplicationProvider
+	appList []AppData
 }
 
-func (c *appCache) forEachCachedApplication(f func(string, fynedesk.AppData) bool) {
+func (c *appCache) forEachCachedApplication(f func(string, AppData) bool) {
 	if c.appList == nil {
 		c.appList = c.source.AvailableApps()
 	}
@@ -19,6 +17,6 @@ func (c *appCache) forEachCachedApplication(f func(string, fynedesk.AppData) boo
 	}
 }
 
-func newAppCache(c fynedesk.ApplicationProvider) *appCache {
+func newAppCache(c ApplicationProvider) *appCache {
 	return &appCache{source: c}
 }

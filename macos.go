@@ -1,4 +1,4 @@
-package icon
+package appie
 
 import (
 	"bytes"
@@ -13,8 +13,6 @@ import (
 	"howett.net/plist"
 
 	"fyne.io/fyne/v2"
-
-	"fyshos.com/fynedesk"
 )
 
 type macOSAppBundle struct {
@@ -76,11 +74,11 @@ func (m *macOSAppBundle) Run([]string) error {
 	return exec.Command("open", "-a", m.runPath).Start()
 }
 
-func (m *macOSAppBundle) Source() *fynedesk.AppSource {
+func (m *macOSAppBundle) Source() *AppSource {
 	return nil
 }
 
-func loadAppBundle(name, path, category string) fynedesk.AppData {
+func loadAppBundle(name, path, category string) AppData {
 	buf, err := os.Open(filepath.Join(path, "Contents", "Info.plist"))
 	if err != nil {
 		fyne.LogError("Unable to read application plist", err)
@@ -129,8 +127,8 @@ func (m *macOSAppProvider) forEachApplication(f func(name, path, category string
 	}
 }
 
-func (m *macOSAppProvider) AvailableApps() []fynedesk.AppData {
-	var icons []fynedesk.AppData
+func (m *macOSAppProvider) AvailableApps() []AppData {
+	var icons []AppData
 	m.forEachApplication(func(name, path, category string) bool {
 		app := loadAppBundle(name, path, category)
 		if app != nil {
@@ -146,9 +144,9 @@ func (m *macOSAppProvider) AvailableThemes() []string {
 	return []string{}
 }
 
-func (m *macOSAppProvider) FindAppFromName(appName string) fynedesk.AppData {
-	var icon fynedesk.AppData
-	m.cache.forEachCachedApplication(func(name string, app fynedesk.AppData) bool {
+func (m *macOSAppProvider) FindAppFromName(appName string) AppData {
+	var icon AppData
+	m.cache.forEachCachedApplication(func(name string, app AppData) bool {
 		if name == appName {
 			icon = app
 			return true
@@ -160,12 +158,8 @@ func (m *macOSAppProvider) FindAppFromName(appName string) fynedesk.AppData {
 	return icon
 }
 
-func (m *macOSAppProvider) FindAppFromWinInfo(win fynedesk.Window) fynedesk.AppData {
-	return m.FindAppFromName(win.Properties().Title())
-}
-
-func (m *macOSAppProvider) DefaultApps() []fynedesk.AppData {
-	var apps []fynedesk.AppData
+func (m *macOSAppProvider) DefaultApps() []AppData {
+	var apps []AppData
 
 	apps = appendAppIfExists(apps, findOneAppFromNames(m, "Terminal", "iTerm"))
 	apps = appendAppIfExists(apps, findOneAppFromNames(m, "Google Chrome", "Firefox", "Safari"))
@@ -176,9 +170,9 @@ func (m *macOSAppProvider) DefaultApps() []fynedesk.AppData {
 	return apps
 }
 
-func (m *macOSAppProvider) FindAppsMatching(pattern string) []fynedesk.AppData {
-	var icons []fynedesk.AppData
-	m.cache.forEachCachedApplication(func(name string, app fynedesk.AppData) bool {
+func (m *macOSAppProvider) FindAppsMatching(pattern string) []AppData {
+	var icons []AppData
+	m.cache.forEachCachedApplication(func(name string, app AppData) bool {
 		if !strings.Contains(strings.ToLower(name), strings.ToLower(pattern)) {
 			return false
 		}
@@ -190,9 +184,9 @@ func (m *macOSAppProvider) FindAppsMatching(pattern string) []fynedesk.AppData {
 	return icons
 }
 
-func (m *macOSAppProvider) CategorizedApps() map[string][]fynedesk.AppData {
-	var allApps, allUtils []fynedesk.AppData
-	m.cache.forEachCachedApplication(func(_ string, app fynedesk.AppData) bool {
+func (m *macOSAppProvider) CategorizedApps() map[string][]AppData {
+	var allApps, allUtils []AppData
+	m.cache.forEachCachedApplication(func(_ string, app AppData) bool {
 		if app.Categories()[0] == "Applications" {
 			allApps = append(allApps, app)
 		} else {
@@ -201,14 +195,14 @@ func (m *macOSAppProvider) CategorizedApps() map[string][]fynedesk.AppData {
 		return false
 	})
 
-	return map[string][]fynedesk.AppData{
+	return map[string][]AppData{
 		"Applications": allApps,
 		"Utilities":    allUtils,
 	}
 }
 
 // NewMacOSAppProvider creates an instance of an ApplicationProvider that can find and decode macOS apps
-func NewMacOSAppProvider() fynedesk.ApplicationProvider {
+func NewMacOSAppProvider() ApplicationProvider {
 	source := &macOSAppProvider{rootDirs: []string{"/Applications", "/Applications/Utilities",
 		"/System/Applications", "/System/Applications/Utilities"}}
 	source.cache = newAppCache(source)

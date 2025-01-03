@@ -1,4 +1,4 @@
-package icon // import "fyshos.com/fynedesk/internal/icon"
+package appie
 
 import (
 	"bufio"
@@ -12,7 +12,6 @@ import (
 
 	"fyne.io/fyne/v2"
 
-	"fyshos.com/fynedesk"
 	_ "github.com/fyne-io/image/xpm" // load XPM icons to supported image format
 )
 
@@ -35,7 +34,7 @@ type fdoApplicationData struct {
 	hide       bool
 	iconCache  fyne.Resource
 
-	source *fynedesk.AppSource
+	source *AppSource
 }
 
 // Name returns the name associated with an fdo app
@@ -75,7 +74,7 @@ func (data *fdoApplicationData) Icon(theme string, size int) fyne.Resource {
 	return data.iconCache
 }
 
-func (data *fdoApplicationData) Source() *fynedesk.AppSource {
+func (data *fdoApplicationData) Source() *AppSource {
 	return data.source
 }
 
@@ -156,7 +155,7 @@ func fdoLookupXdgDataDirs() []string {
 	return locationLookup
 }
 
-func fdoForEachApplicationFile(f func(data fynedesk.AppData) bool) {
+func fdoForEachApplicationFile(f func(data AppData) bool) {
 	locationLookup := fdoLookupXdgDataDirs()
 	for _, dataDir := range locationLookup {
 		testLocation := filepath.Join(dataDir, "applications")
@@ -182,9 +181,9 @@ func fdoForEachApplicationFile(f func(data fynedesk.AppData) bool) {
 }
 
 // lookupApplicationByMetadata looks up an application by comparing the requested name to the contents of .desktop files
-func (f *fdoIconProvider) lookupApplicationByMetadata(appName string) fynedesk.AppData {
-	var returnIcon fynedesk.AppData
-	f.cache.forEachCachedApplication(func(_ string, icon fynedesk.AppData) bool {
+func (f *fdoIconProvider) lookupApplicationByMetadata(appName string) AppData {
+	var returnIcon AppData
+	f.cache.forEachCachedApplication(func(_ string, icon AppData) bool {
 		if icon.(*fdoApplicationData).name == appName || icon.(*fdoApplicationData).exec == appName {
 			returnIcon = icon
 			return true
@@ -195,13 +194,13 @@ func (f *fdoIconProvider) lookupApplicationByMetadata(appName string) fynedesk.A
 }
 
 // lookupApplication looks up an application by name and returns an fdoApplicationData struct
-func (f *fdoIconProvider) lookupApplication(appName string) fynedesk.AppData {
+func (f *fdoIconProvider) lookupApplication(appName string) AppData {
 	if appName == "" {
 		return nil
 	}
 
-	var found fynedesk.AppData
-	f.cache.forEachCachedApplication(func(name string, icon fynedesk.AppData) bool {
+	var found AppData
+	f.cache.forEachCachedApplication(func(name string, icon AppData) bool {
 		if name == appName {
 			found = icon
 			return true
@@ -447,7 +446,7 @@ func fdoLookupAvailableThemes() []string {
 }
 
 // newFdoIconData creates and returns a struct that contains needed fields from a .desktop file
-func newFdoIconData(desktopPath string) fynedesk.AppData {
+func newFdoIconData(desktopPath string) AppData {
 	file, err := os.Open(desktopPath)
 	if err != nil {
 		fyne.LogError("Could not open file", err)
@@ -466,7 +465,7 @@ func newFdoIconData(desktopPath string) fynedesk.AppData {
 		switch currentSection {
 		case "[X-Fyne Source]":
 			if fdoApp.source == nil {
-				fdoApp.source = &fynedesk.AppSource{}
+				fdoApp.source = &AppSource{}
 			}
 			if strings.HasPrefix(line, "Repo=") {
 				name := strings.SplitAfter(line, "=")
@@ -514,9 +513,9 @@ type fdoIconProvider struct {
 }
 
 // AvailableApps returns all of the available applications in a AppData slice
-func (f *fdoIconProvider) AvailableApps() []fynedesk.AppData {
-	var icons []fynedesk.AppData
-	fdoForEachApplicationFile(func(icon fynedesk.AppData) bool {
+func (f *fdoIconProvider) AvailableApps() []AppData {
+	var icons []AppData
+	fdoForEachApplicationFile(func(icon AppData) bool {
 		if icon == nil {
 			return false
 		}
@@ -532,14 +531,14 @@ func (f *fdoIconProvider) AvailableThemes() []string {
 }
 
 // FindAppFromName matches an icon name to a location and returns an AppData interface
-func (f *fdoIconProvider) FindAppFromName(appName string) fynedesk.AppData {
+func (f *fdoIconProvider) FindAppFromName(appName string) AppData {
 	return f.lookupApplication(appName)
 }
 
 // FindAppsMatching returns a list of icons that match a partial name of an app and returns an AppData slice
-func (f *fdoIconProvider) FindAppsMatching(appName string) []fynedesk.AppData {
-	var icons []fynedesk.AppData
-	f.cache.forEachCachedApplication(func(_ string, icon fynedesk.AppData) bool {
+func (f *fdoIconProvider) FindAppsMatching(appName string) []AppData {
+	var icons []AppData
+	f.cache.forEachCachedApplication(func(_ string, icon AppData) bool {
 		if icon == nil {
 			return false
 		}
@@ -554,24 +553,7 @@ func (f *fdoIconProvider) FindAppsMatching(appName string) []fynedesk.AppData {
 	return icons
 }
 
-// FindAppFromWinInfo matches window information to an icon location and returns an AppData interface
-func (f *fdoIconProvider) FindAppFromWinInfo(win fynedesk.Window) fynedesk.AppData {
-	app := f.lookupApplication(win.Properties().Command())
-	if app != nil {
-		return app
-	}
-
-	for _, class := range win.Properties().Class() {
-		icon := f.lookupApplication(class)
-		if icon != nil {
-			return icon
-		}
-	}
-
-	return f.lookupApplication(win.Properties().IconName())
-}
-
-func findOneAppFromNames(f fynedesk.ApplicationProvider, names ...string) fynedesk.AppData {
+func findOneAppFromNames(f ApplicationProvider, names ...string) AppData {
 	for _, name := range names {
 		app := f.FindAppFromName(name)
 		if app != nil {
@@ -582,7 +564,7 @@ func findOneAppFromNames(f fynedesk.ApplicationProvider, names ...string) fynede
 	return nil
 }
 
-func appendAppIfExists(apps []fynedesk.AppData, app fynedesk.AppData) []fynedesk.AppData {
+func appendAppIfExists(apps []AppData, app AppData) []AppData {
 	if app == nil {
 		return apps
 	}
@@ -590,8 +572,8 @@ func appendAppIfExists(apps []fynedesk.AppData, app fynedesk.AppData) []fynedesk
 	return append(apps, app)
 }
 
-func (f *fdoIconProvider) DefaultApps() []fynedesk.AppData {
-	var apps []fynedesk.AppData
+func (f *fdoIconProvider) DefaultApps() []AppData {
+	var apps []AppData
 
 	apps = appendAppIfExists(apps, findOneAppFromNames(f, "fyneterm", "xfce4-terminal", "gnome-terminal", "org.kde.konsole", "xterm"))
 	apps = appendAppIfExists(apps, findOneAppFromNames(f, "chromium", "google-chrome", "firefox"))
@@ -601,12 +583,12 @@ func (f *fdoIconProvider) DefaultApps() []fynedesk.AppData {
 	return apps
 }
 
-func (f *fdoIconProvider) CategorizedApps() map[string][]fynedesk.AppData {
-	cats := map[string][]fynedesk.AppData{}
+func (f *fdoIconProvider) CategorizedApps() map[string][]AppData {
+	cats := map[string][]AppData{}
 
-	f.cache.forEachCachedApplication(func(_ string, app fynedesk.AppData) bool {
+	f.cache.forEachCachedApplication(func(_ string, app AppData) bool {
 		cat := app.(*fdoApplicationData).mainCategory()
-		var list []fynedesk.AppData
+		var list []AppData
 		if c, ok := cats[cat]; ok {
 			list = c
 		}
@@ -618,7 +600,7 @@ func (f *fdoIconProvider) CategorizedApps() map[string][]fynedesk.AppData {
 }
 
 // NewFDOIconProvider returns a new icon provider following the FreeDesktop.org specifications
-func NewFDOIconProvider() fynedesk.ApplicationProvider {
+func NewFDOIconProvider() ApplicationProvider {
 	source := &fdoIconProvider{}
 	source.cache = newAppCache(source)
 	return source

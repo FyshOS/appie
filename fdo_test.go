@@ -1,4 +1,4 @@
-package icon
+package appie
 
 import (
 	"fmt"
@@ -9,16 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"fyne.io/fyne/v2"
-	_ "fyne.io/fyne/v2/test"
-
-	"fyshos.com/fynedesk"
-	"fyshos.com/fynedesk/test"
 )
 
 var iconTheme = "default_theme"
 var iconSize = 32
 
-func exists(data fynedesk.AppData) bool {
+func exists(data AppData) bool {
 	return data != nil && data.Icon(iconTheme, iconSize) != nil
 }
 
@@ -130,40 +126,6 @@ func TestFdoLookupAnyThemeFallback(t *testing.T) {
 func TestFdoLookupIconNotInApps(t *testing.T) {
 	setTestEnv(t)
 	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("xterm")
-	assert.Equal(t, true, exists(data))
-}
-
-// missing - not able to match
-func TestFdoLookupMissing(t *testing.T) {
-	setTestEnv(t)
-	provider := NewFDOIconProvider()
-	win1 := test.NewWindow("NoMatch")
-	data := provider.FindAppFromWinInfo(win1)
-	assert.Equal(t, false, exists(data))
-}
-
-func TestFdoLookupIconByWinInfo(t *testing.T) {
-	setTestEnv(t)
-	provider := NewFDOIconProvider()
-
-	// Test win info lookup by title - should fail as titles are too common
-	win1 := test.NewWindow("App1")
-	data := provider.FindAppFromWinInfo(win1)
-	assert.Equal(t, false, exists(data))
-	// Test win info lookup by class
-	win2 := test.NewWindow("")
-	win2.SetClass([]string{"App2", "app2"})
-	data = provider.FindAppFromWinInfo(win2)
-	assert.Equal(t, true, exists(data))
-	// Test win info lookup by command
-	win3 := test.NewWindow("")
-	win3.SetCommand("app3")
-	data = provider.FindAppFromWinInfo(win3)
-	assert.Equal(t, true, exists(data))
-	// Test win info lookup by icon name
-	win4 := test.NewWindow("")
-	win4.SetIconName("app4")
-	data = provider.FindAppFromWinInfo(win4)
 	assert.Equal(t, true, exists(data))
 }
 

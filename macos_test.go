@@ -1,9 +1,7 @@
-package icon
+package appie
 
 import (
 	"testing"
-
-	"fyshos.com/fynedesk/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,16 +20,6 @@ func TestMacOSAppProvider_FindAppFromName(t *testing.T) {
 	provider.(*macOSAppProvider).rootDirs = []string{"testdata"}
 
 	app := provider.FindAppFromName("Test")
-	assert.NotNil(t, app)
-	assert.Equal(t, "Test", app.Name())
-}
-
-func TestMacOSAppProvider_FindAppFromWinInfo(t *testing.T) {
-	provider := NewMacOSAppProvider()
-	provider.(*macOSAppProvider).rootDirs = []string{"testdata"}
-
-	win := test.NewWindow("Test")
-	app := provider.FindAppFromWinInfo(win)
 	assert.NotNil(t, app)
 	assert.Equal(t, "Test", app.Name())
 }
