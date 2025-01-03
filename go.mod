@@ -1,6 +1,6 @@
 module github.com/FyshOS/appie
 
-go 1.23.4
+go 1.19
 
 require (
 	fyne.io/fyne/v2 v2.5.3
