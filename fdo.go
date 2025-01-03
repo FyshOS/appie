@@ -499,8 +499,8 @@ func newFdoIconData(desktopPath string) AppData {
 			cats := strings.SplitAfter(line, "=")
 			fdoApp.categories = strings.Split(cats[1], ";")
 		} else if strings.HasPrefix(line, "MimeType=") {
-			cats := strings.SplitAfter(line, "=")
-			fdoApp.categories = strings.Split(cats[1], ";")
+			mimes := strings.SplitAfter(line, "=")
+			fdoApp.mime = strings.Split(mimes[1], ";")
 		} else if strings.HasPrefix(line, "NoDisplay=") {
 			val := strings.Split(line, "=")
 			if strings.TrimSpace(val[1]) == "true" {
