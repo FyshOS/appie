@@ -1,6 +1,10 @@
 package appie
 
-import "fyne.io/fyne/v2"
+import (
+	"runtime"
+
+	"fyne.io/fyne/v2"
+)
 
 // AppData is an interface for accessing information about application icons
 type AppData interface {
@@ -20,12 +24,25 @@ type AppSource struct {
 	Repo, Dir string
 }
 
-// ApplicationProvider describes a type that can locate icons and applications for the current system
-type ApplicationProvider interface {
+// Provider describes a type that can locate icons and applications for the current system
+type Provider interface {
 	AvailableApps() []AppData
 	AvailableThemes() []string
 	FindAppFromName(appName string) AppData
 	FindAppsMatching(pattern string) []AppData
 	DefaultApps() []AppData
 	CategorizedApps() map[string][]AppData
+}
+
+// SystemProvider returns an application provider for the current system.
+// for macOS systems it will be a macOSProvider, for Linux/Unix it will be an FDOProvider.
+func SystemProvider() Provider {
+	switch runtime.GOOS {
+	case "darwin":
+		return NewMacOSProvider()
+	case "linux", "freebsd", "openbsd", "netbsd", "dragonfly":
+		return NewFDOProvider()
+	}
+
+	return nil
 }

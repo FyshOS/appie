@@ -34,21 +34,21 @@ func setTestEnv(t *testing.T) {
 // applications/app1.desktop and icons/default_theme/apps/32x32/app1.png
 func TestFdoLookupDefaultTheme(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app1")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app1")
 	assert.Equal(t, true, exists(data))
 }
 
 // applications/com.fyne.app.desktop and icons/default_theme/apps/scalable/app2.svg
 func TestFdoFileNameMisMatchAndScalable(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app2")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app2")
 	assert.Equal(t, true, exists(data))
 }
 
 // check the category from app1
 func TestFdoIconCategory(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app1")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app1")
 	assert.Equal(t, 2, len(data.Categories()))
 	assert.Equal(t, "App1", data.Categories()[0])
 
@@ -66,42 +66,42 @@ func TestFdoIconNameIsPath(t *testing.T) {
 		fyne.LogError("Could not create desktop for Icon Name path example", err)
 		t.FailNow()
 	}
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app3")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app3")
 	assert.Equal(t, true, exists(data))
 }
 
 // check NoDisplay from app4
 func TestFdoIconHide(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app4")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app4")
 	assert.Equal(t, true, data.Hidden())
 }
 
 // applications/app4.desktop and pixmaps/app4.png
 func TestFdoIconInPixmaps(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app4")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app4")
 	assert.Equal(t, true, exists(data))
 }
 
 // applications/app5.desktop and icons/hicolor/32x32/apps/app5.png
 func TestFdoIconHicolorFallback(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app5")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app5")
 	assert.Equal(t, true, exists(data))
 }
 
 // applications/app6.desktop and icons/hicolor/scalable/apps/app6.svg
 func TestFdoIconHicolorFallbackScalable(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app6")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app6")
 	assert.Equal(t, true, exists(data))
 }
 
 // applications/com.fyne.app.desktop
 func TestFdoIconSource(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app2")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app2")
 
 	assert.NotNil(t, data.Source())
 	assert.Equal(t, "https://example.com/repo", data.Source().Repo)
@@ -111,27 +111,27 @@ func TestFdoIconSource(t *testing.T) {
 // applications/app7.desktop and icons/default_theme/apps/16x16/app7.png
 func TestFdoLookupDefaultThemeDifferentSize(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app7")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app7")
 	assert.Equal(t, true, exists(data))
 }
 
 // applications/app8.desktop and icons/third_theme/apps/32/app8.png
 func TestFdoLookupAnyThemeFallback(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("app8")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("app8")
 	assert.Equal(t, true, exists(data))
 }
 
 // applications/xterm.desktop and icons/third_theme/emblems/16x16/app9.png
 func TestFdoLookupIconNotInApps(t *testing.T) {
 	setTestEnv(t)
-	data := NewFDOIconProvider().(*fdoIconProvider).lookupApplication("xterm")
+	data := NewFDOProvider().(*fdoIconProvider).lookupApplication("xterm")
 	assert.Equal(t, true, exists(data))
 }
 
 func TestFdoLookupPartialMatches(t *testing.T) {
 	setTestEnv(t)
-	dataMatches := NewFDOIconProvider().FindAppsMatching("app")
+	dataMatches := NewFDOProvider().FindAppsMatching("app")
 	assert.Equal(t, true, len(dataMatches) > 1)
 	for _, data := range dataMatches {
 		assert.Equal(t, true, exists(data))
@@ -140,14 +140,14 @@ func TestFdoLookupPartialMatches(t *testing.T) {
 
 func TestFdoIconProvider_findOneAppFromNames(t *testing.T) {
 	setTestEnv(t)
-	single := findOneAppFromNames(NewFDOIconProvider(), "missing", "app1", "xterm")
+	single := findOneAppFromNames(NewFDOProvider(), "missing", "app1", "xterm")
 	assert.NotNil(t, single)
 	assert.Equal(t, "App1", single.Name())
 }
 
 func TestFdoIconProvider_DefaultApps(t *testing.T) {
 	setTestEnv(t)
-	defaults := NewFDOIconProvider().DefaultApps()
+	defaults := NewFDOProvider().DefaultApps()
 	assert.True(t, len(defaults) > 0)
 }
 

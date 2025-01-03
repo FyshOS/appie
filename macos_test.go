@@ -16,7 +16,7 @@ func TestLoadAppBundle(t *testing.T) {
 }
 
 func TestMacOSAppProvider_FindAppFromName(t *testing.T) {
-	provider := NewMacOSAppProvider()
+	provider := NewMacOSProvider()
 	provider.(*macOSAppProvider).rootDirs = []string{"testdata"}
 
 	app := provider.FindAppFromName("Test")

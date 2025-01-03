@@ -560,7 +560,7 @@ func (f *fdoIconProvider) FindAppsMatching(appName string) []AppData {
 	return icons
 }
 
-func findOneAppFromNames(f ApplicationProvider, names ...string) AppData {
+func findOneAppFromNames(f Provider, names ...string) AppData {
 	for _, name := range names {
 		app := f.FindAppFromName(name)
 		if app != nil {
@@ -606,8 +606,8 @@ func (f *fdoIconProvider) CategorizedApps() map[string][]AppData {
 	return cats
 }
 
-// NewFDOIconProvider returns a new icon provider following the FreeDesktop.org specifications
-func NewFDOIconProvider() ApplicationProvider {
+// NewFDOProvider returns a new application provider following the FreeDesktop.org specifications
+func NewFDOProvider() Provider {
 	source := &fdoIconProvider{}
 	source.cache = newAppCache(source)
 	return source

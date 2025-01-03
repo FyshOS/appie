@@ -210,8 +210,8 @@ func (m *macOSAppProvider) CategorizedApps() map[string][]AppData {
 	}
 }
 
-// NewMacOSAppProvider creates an instance of an ApplicationProvider that can find and decode macOS apps
-func NewMacOSAppProvider() ApplicationProvider {
+// NewMacOSProvider creates an instance of a Provider that can find and decode macOS apps
+func NewMacOSProvider() Provider {
 	source := &macOSAppProvider{rootDirs: []string{"/Applications", "/Applications/Utilities",
 		"/System/Applications", "/System/Applications/Utilities"}}
 	source.cache = newAppCache(source)

@@ -1,7 +1,7 @@
 package appie
 
 type appCache struct {
-	source  ApplicationProvider
+	source  Provider
 	appList []AppData
 }
 
@@ -17,6 +17,6 @@ func (c *appCache) forEachCachedApplication(f func(string, AppData) bool) {
 	}
 }
 
-func newAppCache(c ApplicationProvider) *appCache {
+func newAppCache(c Provider) *appCache {
 	return &appCache{source: c}
 }
