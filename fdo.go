@@ -83,10 +83,23 @@ func (data *fdoApplicationData) Source() *AppSource {
 }
 
 // extractArgs sanitises argument parameters from an Exec configuration
-func extractArgs(args []string) []string {
+func extractArgs(args, params []string) []string {
+	paramIndex := 0
 	var ret []string
 	for _, arg := range args {
 		if len(arg) >= 2 && arg[0] == '%' {
+			switch arg[1] {
+			case 'u', 'f': // url, file
+				if paramIndex <= len(params) {
+					ret = append(ret, params[paramIndex])
+					paramIndex++
+				}
+			case 'U', 'F': // url list, file list
+				if paramIndex <= len(params) {
+					ret = append(ret, params[paramIndex:]...)
+					paramIndex = len(params)
+				}
+			}
 			continue
 		}
 		ret = append(ret, arg)
@@ -95,8 +108,15 @@ func extractArgs(args []string) []string {
 	return ret
 }
 
-// Run executes the command for this fdo app
+// Run executes the command for this fdo app.
+// It also passes in the specified environment variables
 func (data *fdoApplicationData) Run(env []string) error {
+	return data.RunWithParameters([]string{}, env)
+}
+
+// RunWithParameters executes the command for this fdo app.
+// It passes any parameters specified and sets up the listed environment.
+func (data *fdoApplicationData) RunWithParameters(params, env []string) error {
 	vars := os.Environ()
 	vars = append(vars, env...)
 
@@ -108,7 +128,7 @@ func (data *fdoApplicationData) Run(env []string) error {
 
 	cmd := exec.Command(command)
 	if len(commands) > 1 {
-		cmd.Args = extractArgs(commands) // Args[0] should be binary path
+		cmd.Args = extractArgs(commands, params) // Args[0] should be binary path
 	}
 
 	cmd.Env = vars

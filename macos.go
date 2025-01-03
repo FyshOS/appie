@@ -78,9 +78,17 @@ func (m *macOSAppBundle) MimeTypes() []string {
 	return []string{}
 }
 
-func (m *macOSAppBundle) Run([]string) error {
+func (m *macOSAppBundle) Run(env []string) error {
+	return m.RunWithParameters([]string{}, env)
+}
+
+func (m *macOSAppBundle) RunWithParameters(params, _ []string) error {
 	// in macOS test mode we ignore the wm env flags
-	return exec.Command("open", "-a", m.runPath).Start()
+	if len(params) == 0 {
+		return exec.Command("open", "-a", m.runPath).Start()
+	}
+
+	return exec.Command("open", "-a", m.runPath, params[0]).Start()
 }
 
 func (m *macOSAppBundle) Source() *AppSource {

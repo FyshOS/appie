@@ -152,9 +152,9 @@ func TestFdoIconProvider_DefaultApps(t *testing.T) {
 }
 
 func TestFdoExtractArgs(t *testing.T) {
-	params := []string{"-u", "thing", "%U"}
+	params := []string{"-u", "thing", "%u"}
 
-	extracted := extractArgs(params)
+	extracted := extractArgs(params, []string{"https://example.com"})
 
-	assert.Equal(t, []string{"-u", "thing"}, extracted)
+	assert.Equal(t, []string{"-u", "thing", "https://example.com"}, extracted)
 }

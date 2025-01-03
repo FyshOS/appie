@@ -8,8 +8,9 @@ import (
 
 // AppData is an interface for accessing information about application icons
 type AppData interface {
-	Name() string       // Name is the name of the app usually
-	Run([]string) error // Run is the command to run the app, passing any environment variables to be set
+	Name() string                               // Name is the name of the app usually
+	Run([]string) error                         // Run is the command to run the app, passing any environment variables to be set
+	RunWithParameters([]string, []string) error // RunWithParameters is the command to run the app, passing command line parameters and setting any specified environment variables
 
 	Categories() []string                      // Categories is a list of categories that the app fits in (platform specific)
 	Hidden() bool                              // Hidden specifies whether instances of this app should be hidden
