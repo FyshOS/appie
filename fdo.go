@@ -30,9 +30,9 @@ type fdoApplicationData struct {
 	iconPath string // Icon path
 	exec     string // Command to execute application
 
-	categories []string
-	hide       bool
-	iconCache  fyne.Resource
+	categories, mime []string
+	hide             bool
+	iconCache        fyne.Resource
 
 	source *AppSource
 }
@@ -72,6 +72,10 @@ func (data *fdoApplicationData) Icon(theme string, size int) fyne.Resource {
 
 	data.iconCache = loadIcon(path)
 	return data.iconCache
+}
+
+func (data *fdoApplicationData) MimeTypes() []string {
+	return data.mime
 }
 
 func (data *fdoApplicationData) Source() *AppSource {
@@ -492,6 +496,9 @@ func newFdoIconData(desktopPath string) AppData {
 			exec := strings.SplitAfter(line, "=")
 			fdoApp.exec = exec[1]
 		} else if strings.HasPrefix(line, "Categories=") {
+			cats := strings.SplitAfter(line, "=")
+			fdoApp.categories = strings.Split(cats[1], ";")
+		} else if strings.HasPrefix(line, "MimeType=") {
 			cats := strings.SplitAfter(line, "=")
 			fdoApp.categories = strings.Split(cats[1], ";")
 		} else if strings.HasPrefix(line, "NoDisplay=") {

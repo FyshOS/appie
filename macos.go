@@ -69,6 +69,15 @@ func (m *macOSAppBundle) Icon(_ string, _ int) fyne.Resource {
 	return m.iconCache
 }
 
+func (m *macOSAppBundle) MimeTypes() []string {
+	// TODO actually find out what mime types are associated with this app
+	// Possibly through parsing UTIs etc, could be mdls command
+	// might need to explore _UTCopyDeclaredTypeIdentifiers private API
+	// then per-app we can iterate the associated UTIs and access tags
+	// using key "public.mime-type" to get a NSArray<NSString *> of mime types
+	return []string{}
+}
+
 func (m *macOSAppBundle) Run([]string) error {
 	// in macOS test mode we ignore the wm env flags
 	return exec.Command("open", "-a", m.runPath).Start()
