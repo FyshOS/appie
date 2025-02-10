@@ -90,12 +90,12 @@ func extractArgs(args, params []string) []string {
 		if len(arg) >= 2 && arg[0] == '%' {
 			switch arg[1] {
 			case 'u', 'f': // url, file
-				if paramIndex <= len(params) {
+				if paramIndex < len(params) {
 					ret = append(ret, params[paramIndex])
 					paramIndex++
 				}
 			case 'U', 'F': // url list, file list
-				if paramIndex <= len(params) {
+				if paramIndex < len(params) {
 					ret = append(ret, params[paramIndex:]...)
 					paramIndex = len(params)
 				}
