@@ -159,7 +159,7 @@ func loadIcon(path string) fyne.Resource {
 		return nil
 	}
 
-	return fyne.NewStaticResource(filepath.Base(path), data)
+	return fyne.NewStaticResource(path, data)
 }
 
 // fdoLookupXdgDataDirs returns a string slice of all XDG_DATA_DIRS
@@ -453,16 +453,23 @@ func fdoLookupAvailableThemes() []string {
 	var themes []string
 	locationLookup := fdoLookupXdgDataDirs()
 	for _, dataDir := range locationLookup {
-		files, err := os.ReadDir(filepath.Join(dataDir, "icons"))
+		parent := filepath.Join(dataDir, "icons")
+		files, err := os.ReadDir(parent)
 		if err != nil {
 			continue
 		}
-		//Enter icon theme
+		// Enter icon theme
 		for _, f := range files {
 			if strings.HasPrefix(f.Name(), ".") || !f.IsDir() {
 				continue
 			}
-			//Example is /usr/share/icons/gnome
+
+			// Check has apps
+			if !hasSubDir(filepath.Join(parent, f.Name()), "apps") {
+				continue
+			}
+
+			// Example is /usr/share/icons/gnome
 			themes = append(themes, f.Name())
 		}
 	}
@@ -635,4 +642,33 @@ func NewFDOProvider() Provider {
 	source := &fdoIconProvider{}
 	source.cache = newAppCache(source)
 	return source
+}
+
+func hasSubDir(path, dir string) bool {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return false
+	}
+
+	for _, file := range files {
+		if file.Name() == dir {
+			return true
+		}
+
+		if file.IsDir() {
+			files2, err2 := os.ReadDir(filepath.Join(path, file.Name()))
+			if err2 != nil {
+				continue
+			}
+			
+			// check one subdir level too
+			for _, file2 := range files2 {
+				if filepath.Base(file2.Name()) == dir {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
