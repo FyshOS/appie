@@ -557,6 +557,10 @@ func (f *fdoIconProvider) AvailableThemes() []string {
 	return fdoLookupAvailableThemes()
 }
 
+func (f *fdoIconProvider) ClearCache() {
+	f.cache.clearCache()
+}
+
 // FindAppFromName matches an icon name to a location and returns an AppData interface
 func (f *fdoIconProvider) FindAppFromName(appName string) AppData {
 	return f.lookupApplication(appName)

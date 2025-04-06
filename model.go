@@ -33,6 +33,8 @@ type Provider interface {
 	FindAppsMatching(pattern string) []AppData
 	DefaultApps() []AppData
 	CategorizedApps() map[string][]AppData
+
+	ClearCache()
 }
 
 // SystemProvider returns an application provider for the current system.

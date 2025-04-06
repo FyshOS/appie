@@ -5,6 +5,10 @@ type appCache struct {
 	appList []AppData
 }
 
+func (c *appCache) clearCache() {
+	c.appList = nil
+}
+
 func (c *appCache) forEachCachedApplication(f func(string, AppData) bool) {
 	if c.appList == nil {
 		c.appList = c.source.AvailableApps()

@@ -161,6 +161,10 @@ func (m *macOSAppProvider) AvailableThemes() []string {
 	return []string{}
 }
 
+func (m *macOSAppProvider) ClearCache() {
+	m.cache.clearCache()
+}
+
 func (m *macOSAppProvider) FindAppFromName(appName string) AppData {
 	var icon AppData
 	m.cache.forEachCachedApplication(func(name string, app AppData) bool {
