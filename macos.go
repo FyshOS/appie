@@ -28,6 +28,10 @@ type macOSAppBundle struct {
 	iconCache fyne.Resource
 }
 
+func (m *macOSAppBundle) Actions() []Action {
+	return nil
+}
+
 func (m *macOSAppBundle) Name() string {
 	return m.DisplayName
 }

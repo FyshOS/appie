@@ -34,7 +34,12 @@ type fdoApplicationData struct {
 	hide             bool
 	iconCache        fyne.Resource
 
-	source *AppSource
+	source  *AppSource
+	actions []Action
+}
+
+func (data *fdoApplicationData) Actions() []Action {
+	return data.actions
 }
 
 // Name returns the name associated with an fdo app
@@ -225,7 +230,7 @@ func (f *fdoIconProvider) lookupApplication(appName string) AppData {
 
 	var found AppData
 	f.cache.forEachCachedApplication(func(name string, icon AppData) bool {
-		if name == appName {
+		if strings.EqualFold(name, appName) {
 			found = icon
 			return true
 		}
@@ -487,14 +492,13 @@ func newFdoIconData(desktopPath string) AppData {
 
 	scanner := bufio.NewScanner(file)
 	fdoApp := fdoApplicationData{name: "", iconName: "", iconPath: "", exec: ""}
-	var currentSection string
+	var currentSection, currentAction string
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "[") {
 			currentSection = line
 		}
-		switch currentSection {
-		case "[X-Fyne Source]":
+		if currentSection == "[X-Fyne Source]" {
 			if fdoApp.source == nil {
 				fdoApp.source = &AppSource{}
 			}
@@ -506,8 +510,32 @@ func newFdoIconData(desktopPath string) AppData {
 				name := strings.SplitAfter(line, "=")
 				fdoApp.source.Dir = name[1]
 			}
-		case "[Desktop Entry]": // fall through to code below
-		default:
+		} else if strings.Contains(currentSection, "[Desktop Action") {
+			var action **fdoAction
+			if currentSection == currentAction {
+				act := fdoApp.actions[len(fdoApp.actions)-1].(*fdoAction)
+				action = &act
+			} else if strings.Contains(line, "[Desktop Action") {
+				act := &fdoAction{}
+				action = &act
+				currentAction = line
+				fdoApp.actions = append(fdoApp.actions, *action)
+			} else {
+				fdoApp.actions = append(fdoApp.actions, *action)
+			}
+
+			if strings.HasPrefix(line, "Name=") {
+				name := strings.SplitAfter(line, "=")
+				(*action).name = name[1]
+			}
+			if strings.HasPrefix(line, "Exec=") {
+				name := strings.SplitAfter(line, "=")
+				(*action).exec = name[1]
+			}
+			continue
+		} else if currentSection == "[Desktop Entry]" {
+			// fall through to code below
+		} else {
 			continue
 		}
 		if strings.HasPrefix(line, "Name=") {
@@ -591,6 +619,33 @@ func (f *fdoIconProvider) FindAppsMatching(appName string) []AppData {
 	return icons
 }
 
+type fdoAction struct {
+	name, exec string
+}
+
+func (f *fdoAction) Name() string {
+	return f.name
+}
+
+func (f *fdoAction) Run(env []string) error {
+	vars := os.Environ()
+	vars = append(vars, env...)
+
+	commands := strings.Split(f.exec, " ")
+	command := commands[0]
+	if command[0] == '"' {
+		command = command[1 : len(command)-1]
+	}
+
+	cmd := exec.Command(command)
+	if len(commands) > 1 {
+		cmd.Args = commands
+	}
+
+	cmd.Env = vars
+	return cmd.Start()
+}
+
 func findOneAppFromNames(f Provider, names ...string) AppData {
 	for _, name := range names {
 		app := f.FindAppFromName(name)
@@ -660,7 +715,7 @@ func hasSubDir(path, dir string) bool {
 			if err2 != nil {
 				continue
 			}
-			
+
 			// check one subdir level too
 			for _, file2 := range files2 {
 				if filepath.Base(file2.Name()) == dir {

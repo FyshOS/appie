@@ -18,6 +18,7 @@ type AppData interface {
 	MimeTypes() []string                       // MimeTypes returns a list of mimetypes that this application can handle
 
 	Source() *AppSource // Source will return the location of the app source code from metadata, if known
+	Actions() []Action
 }
 
 // AppSource represents the source code information of an application
@@ -35,6 +36,11 @@ type Provider interface {
 	CategorizedApps() map[string][]AppData
 
 	ClearCache()
+}
+
+type Action interface {
+	Name() string
+	Run(env []string) error
 }
 
 // SystemProvider returns an application provider for the current system.
