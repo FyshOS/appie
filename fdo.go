@@ -20,7 +20,8 @@ var (
 	fallbackCategory    = "Other"
 	supportedCategories = []string{
 		"AudioVideo", "Development", "Education", "Game", "Graphics", "Network",
-		"Office", "Science", "Settings", "System", "Utility"}
+		"Office", "Science", "Settings", "System", "Utility",
+	}
 )
 
 // fdoApplicationData is a structure that contains information about .desktop files
@@ -241,7 +242,7 @@ func (f *fdoIconProvider) lookupApplication(appName string) AppData {
 		return found
 	}
 
-	//If no match was found checking by filenames, check by file contents
+	// If no match was found checking by filenames, check by file contents
 	return f.lookupApplicationByMetadata(appName)
 }
 
@@ -363,7 +364,7 @@ func FdoLookupIconPathInTheme(iconSize string, dir string, parentDir string, ico
 	}
 	// If the requested icon wasn't found in the specific size or scalable dirs
 	// of the theme try all sizes within theme and all icon dirs besides apps
-	var subIconDirs = []string{"apps", "actions", "devices", "emblems", "legacy", "mimetypes", "places", "status"}
+	subIconDirs := []string{"apps", "actions", "devices", "emblems", "legacy", "mimetypes", "places", "status"}
 	iconSizeInt, err := strconv.Atoi(iconSize)
 	if err != nil {
 		iconSizeInt = 32
@@ -375,7 +376,7 @@ func FdoLookupIconPathInTheme(iconSize string, dir string, parentDir string, ico
 		}
 	}
 
-	//Lets check inherited themes for the match
+	// Lets check inherited themes for the match
 	indexTheme := filepath.Join(dir, "index.theme")
 	if _, err := os.Stat(indexTheme); !os.IsNotExist(err) {
 		file, err := os.Open(indexTheme)
@@ -426,7 +427,7 @@ func FdoLookupIconPath(theme string, size int, iconName string) string {
 	iconTheme := theme
 	iconSize := strconv.Itoa(size)
 	for _, dataDir := range locationLookup {
-		//Example is /usr/share/icons/icon_theme
+		// Example is /usr/share/icons/icon_theme
 		dir := filepath.Join(dataDir, "icons", iconTheme)
 		iconPath := FdoLookupIconPathInTheme(iconSize, dir, dataDir, iconName)
 		if iconPath != "" {
@@ -434,7 +435,7 @@ func FdoLookupIconPath(theme string, size int, iconName string) string {
 		}
 	}
 	for _, dataDir := range locationLookup {
-		//Hicolor is the default fallback theme - Example /usr/share/icons/icon_theme/hicolor
+		// Hicolor is the default fallback theme - Example /usr/share/icons/icon_theme/hicolor
 		dir := filepath.Join(dataDir, "icons", "hicolor")
 		iconPath := FdoLookupIconPathInTheme(iconSize, dir, dataDir, iconName)
 		if iconPath != "" {
@@ -442,7 +443,7 @@ func FdoLookupIconPath(theme string, size int, iconName string) string {
 		}
 	}
 	for _, dataDir := range locationLookup {
-		//Icons may be in the pixmaps directory - test before we do our final fallback
+		// Icons may be in the pixmaps directory - test before we do our final fallback
 		for _, extension := range iconExtensions {
 			iconPath := filepath.Join(dataDir, "pixmaps", iconName+extension)
 			if _, err := os.Stat(iconPath); err == nil {
@@ -450,7 +451,7 @@ func FdoLookupIconPath(theme string, size int, iconName string) string {
 			}
 		}
 	}
-	//No Icon Was Found
+	// No Icon Was Found
 	return ""
 }
 
@@ -520,8 +521,6 @@ func newFdoIconData(desktopPath string) AppData {
 				action = &act
 				currentAction = line
 				fdoApp.actions = append(fdoApp.actions, *action)
-			} else {
-				fdoApp.actions = append(fdoApp.actions, *action)
 			}
 
 			if strings.HasPrefix(line, "Name=") {
@@ -548,8 +547,8 @@ func newFdoIconData(desktopPath string) AppData {
 				fdoApp.iconPath = icon[1]
 			}
 		} else if strings.HasPrefix(line, "Exec=") {
-			exec := strings.SplitAfter(line, "=")
-			fdoApp.exec = exec[1]
+			exe := strings.SplitAfter(line, "=")
+			fdoApp.exec = exe[1]
 		} else if strings.HasPrefix(line, "Categories=") {
 			cats := strings.SplitAfter(line, "=")
 			fdoApp.categories = strings.Split(cats[1], ";")

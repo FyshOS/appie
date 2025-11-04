@@ -161,7 +161,7 @@ func (m *macOSAppProvider) AvailableApps() []AppData {
 }
 
 func (m *macOSAppProvider) AvailableThemes() []string {
-	//I'm not sure this is relevant on Mac OSX
+	// I'm not sure this is relevant on Mac OSX
 	return []string{}
 }
 
@@ -228,8 +228,10 @@ func (m *macOSAppProvider) CategorizedApps() map[string][]AppData {
 
 // NewMacOSProvider creates an instance of a Provider that can find and decode macOS apps
 func NewMacOSProvider() Provider {
-	source := &macOSAppProvider{rootDirs: []string{"/Applications", "/Applications/Utilities",
-		"/System/Applications", "/System/Applications/Utilities"}}
+	source := &macOSAppProvider{rootDirs: []string{
+		"/Applications", "/Applications/Utilities",
+		"/System/Applications", "/System/Applications/Utilities",
+	}}
 	source.cache = newAppCache(source)
 	return source
 }
