@@ -178,6 +178,7 @@ func fdoLookupXdgDataDirs() []string {
 		if err == nil {
 			fallbackLocations = append(fallbackLocations, filepath.Join(homeDir, ".local/share"))
 		}
+		fallbackLocations = append(fallbackLocations, "/var/lib/snapd/desktop")
 		fallbackLocations = append(fallbackLocations, "/usr/local/share")
 		fallbackLocations = append(fallbackLocations, "/usr/share")
 		return fallbackLocations
